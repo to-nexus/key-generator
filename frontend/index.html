@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>NEXUS Key Generator</title>
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+    <div id="app">
+        <div class="container">
+            <div class="header">
+                <div class="logo">
+                    <div class="logo-text">
+                        <span class="logo-primary">NEXUS</span>
+                    </div>
+                </div>
+                <h1>Key Generator</h1>
+                <p class="subtitle">Connecting the world through blockchain</p>
+            </div>
+            
+            <div class="form-section">
+                <div class="input-group">
+                    <label for="password">비밀번호:</label>
+                    <input type="password" id="password" placeholder="키스토어 비밀번호를 입력하세요">
+                    <small class="password-requirements">
+                        <strong>비밀번호 요구사항:</strong><br>
+                        • 최소 8자 이상<br>
+                        • 대문자 1개 이상<br>
+                        • 소문자 1개 이상<br>
+                        • 숫자 1개 이상<br>
+                        • 특수문자 1개 이상 (!@#$%^&* 등)
+                    </small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirmPassword">비밀번호 확인:</label>
+                    <input type="password" id="confirmPassword" placeholder="비밀번호를 다시 입력하세요">
+                    <small id="passwordMatch" class="password-match"></small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="shareCount">샤미르 쉐어 개수:</label>
+                    <input type="number" id="shareCount" value="1" min="1" max="10">
+                    <small>1 = 일반 키스토어, 2 이상 = 샤미르 쉐어</small>
+                </div>
+                
+                <button id="generateBtn" class="generate-btn" disabled>키 생성</button>
+            </div>
+            
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h2>생성된 키 정보</h2>
+                
+                <div class="result-tabs">
+                    <button class="tab-btn active" data-tab="keystore">키스토어</button>
+                    <button class="tab-btn" data-tab="publicKey">공개키</button>
+                    <button class="tab-btn" data-tab="privateKey">개인키</button>
+                    <button class="tab-btn" data-tab="address">주소</button>
+                    <button class="tab-btn" data-tab="shares" id="sharesTab" style="display: none;">샤미르 쉐어</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div id="keystore" class="tab-pane active">
+                        <pre id="keystoreContent"></pre>
+                    </div>
+                    <div id="publicKey" class="tab-pane">
+                        <pre id="publicKeyContent"></pre>
+                    </div>
+                    <div id="privateKey" class="tab-pane">
+                        <pre id="privateKeyContent"></pre>
+                    </div>
+                    <div id="address" class="tab-pane">
+                        <pre id="addressContent"></pre>
+                    </div>
+                    <div id="shares" class="tab-pane">
+                        <div id="sharesContent"></div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="copyBtn" class="copy-btn">복사</button>
+                    <button id="downloadBtn" class="download-btn">다운로드</button>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>Powered by <span class="brand">NEXUS</span> • Connecting the world through blockchain</p>
+            </div>
+        </div>
+    </div>
+    <script src="./src/main.js" type="module"></script>
+</body>
+</html>
