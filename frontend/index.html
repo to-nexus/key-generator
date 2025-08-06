@@ -40,9 +40,18 @@
                 </div>
                 
                 <div class="input-group">
-                    <label for="shareCount">샤미르 쉐어 개수:</label>
-                    <input type="number" id="shareCount" value="1" min="1" max="10">
-                    <small>1 = 일반 키스토어, 2 이상 = 샤미르 쉐어</small>
+                    <label for="shareCount">공유 키 설정:</label>
+                    <div class="share-config">
+                        <div class="share-config-item">
+                            <label for="totalShares">총 개수:</label>
+                            <input type="number" id="totalShares" value="1" min="1" max="10">
+                        </div>
+                        <div class="share-config-item">
+                            <label for="threshold">복구에 필요한 최소 개수:</label>
+                            <input type="number" id="threshold" value="2" min="1" max="10">
+                        </div>
+                    </div>
+                    <small>1 = 일반 키스토어, 2 이상 = 공유 키</small>
                 </div>
                 
                 <button id="generateBtn" class="generate-btn" disabled>키 생성</button>
@@ -73,7 +82,20 @@
                         <pre id="addressContent"></pre>
                     </div>
                     <div id="shares" class="tab-pane">
-                        <div id="sharesContent"></div>
+                        <div class="share-download-section">
+                            <h3>공유 키 다운로드</h3>
+                            <div class="recovered-address-section">
+                                <h4>복구된 지갑 주소:</h4>
+                                <div id="recoveredAddress" class="recovered-address"></div>
+                                <small class="recovered-address-note">※ 모든 공유 키를 combine하여 복구된 주소입니다. 원본 주소와 일치해야 합니다.</small>
+                            </div>
+                            <p class="share-info">각 공유 키는 개별적으로 암호화된 keystore 형태로 다운로드됩니다. 각 공유 키마다 다른 비밀번호를 설정하는 것을 권장합니다.</p>
+                            
+                            <div class="share-list">
+                                <h4>생성된 공유 키 목록:</h4>
+                                <div id="shareList" class="share-list-content"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
