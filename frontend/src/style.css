@@ -239,17 +239,117 @@ h1 {
 }
 
 .tab-pane pre {
-    background: #0f172a;
-    color: #e2e8f0;
+    background: rgba(15, 23, 42, 0.8);
     padding: 1rem;
-    border-radius: 6px;
-    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
     font-size: 0.875rem;
     line-height: 1.5;
-    white-space: pre-wrap;
+    overflow-x: auto;
     word-break: break-all;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #e2e8f0;
+    margin: 0;
+}
+
+.private-key-warning {
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.warning-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.private-key-warning h3 {
+    color: #ef4444;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.warning-content {
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+.warning-content p {
+    color: #ef4444;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.warning-content ul {
+    color: #e2e8f0;
+    margin-left: 1rem;
+}
+
+.warning-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.reveal-private-key-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.reveal-private-key-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.reveal-private-key-btn:active {
+    transform: translateY(0);
+}
+
+.private-key-content {
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid rgba(239, 68, 68, 0.5);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.private-key-content pre {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.private-key-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+.private-key-actions .copy-btn,
+.private-key-actions .download-btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+}
+
+.private-key-actions .copy-btn:disabled,
+.private-key-actions .download-btn:disabled {
+    background: #6b7280;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .action-buttons {

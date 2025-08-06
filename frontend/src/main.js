@@ -17,6 +17,12 @@ const sharesTab = document.getElementById('sharesTab')
 const shareListElement = document.getElementById('shareList')
 const recoveredAddressElement = document.getElementById('recoveredAddress')
 
+// 개인키 관련 요소들
+const revealPrivateKeyBtn = document.getElementById('revealPrivateKeyBtn')
+const privateKeyText = document.getElementById('privateKeyText')
+const copyPrivateKeyBtn = document.getElementById('copyPrivateKeyBtn')
+const downloadPrivateKeyBtn = document.getElementById('downloadPrivateKeyBtn')
+
 // 탭 관련 요소들
 const tabBtns = document.querySelectorAll('.tab-btn')
 const tabPanes = document.querySelectorAll('.tab-pane')
@@ -34,11 +40,17 @@ const downloadBtn = document.getElementById('downloadBtn')
 // 현재 활성 탭과 결과 데이터
 let currentTab = 'keystore'
 let currentResult = null
+let privateKeyRevealed = false
 
 // 이벤트 리스너들
 generateBtn.addEventListener('click', handleGenerate)
 copyBtn.addEventListener('click', handleCopy)
 downloadBtn.addEventListener('click', handleDownload)
+
+// 개인키 관련 이벤트 리스너
+revealPrivateKeyBtn.addEventListener('click', handleRevealPrivateKey)
+copyPrivateKeyBtn.addEventListener('click', handleCopyPrivateKey)
+downloadPrivateKeyBtn.addEventListener('click', handleDownloadPrivateKey)
 
 // 비밀번호 확인 이벤트 리스너
 passwordInput.addEventListener('input', checkPasswordMatch)
@@ -240,12 +252,40 @@ async function handleGenerate() {
 // 결과 표시
 function displayResults(result, isShamir = false) {
     currentResult = result
+    privateKeyRevealed = false // 개인키 노출 상태 초기화
+    
+    console.log('displayResults 호출됨:', { isShamir, hasPrivateKey: !!result.privateKey })
     
     // 기본 정보 표시
     keystoreContent.textContent = result.keystore
     publicKeyContent.textContent = result.publicKey
-    privateKeyContent.textContent = result.privateKey
     addressContent.textContent = result.address
+    
+    // 개인키는 노출 버튼 클릭 시에만 표시되도록 설정
+    privateKeyText.textContent = ''
+    const warningElement = document.querySelector('.private-key-warning')
+    const contentElement = document.getElementById('privateKeyContent')
+    
+    if (warningElement) {
+        warningElement.style.display = 'block'
+        console.log('개인키 경고 메시지 표시')
+    }
+    
+    if (contentElement) {
+        contentElement.style.display = 'none'
+        console.log('개인키 내용 숨김')
+    }
+    
+    // 복사/다운로드 버튼 비활성화
+    if (copyPrivateKeyBtn) {
+        copyPrivateKeyBtn.disabled = true
+        console.log('개인키 복사 버튼 비활성화')
+    }
+    
+    if (downloadPrivateKeyBtn) {
+        downloadPrivateKeyBtn.disabled = true
+        console.log('개인키 다운로드 버튼 비활성화')
+    }
 
     // 공유 키 모드일 때 키스토어 탭 숨기기
     if (isShamir) {
@@ -369,22 +409,30 @@ async function combineAndDisplayRecoveredAddress(shares, originalAddress) {
     }
 }
 
-// 탭 전환
+// 탭 전환 처리
 function switchTab(tabName) {
-    // 모든 탭 버튼 비활성화
-    tabBtns.forEach(btn => btn.classList.remove('active'))
-    
-    // 모든 탭 패널 숨기기
-    tabPanes.forEach(pane => pane.classList.remove('active'))
+    // 모든 탭 비활성화
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active')
+    })
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.remove('active')
+    })
     
     // 선택된 탭 활성화
-    const selectedBtn = document.querySelector(`[data-tab="${tabName}"]`)
-    const selectedPane = document.getElementById(tabName)
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active')
+    document.getElementById(tabName).classList.add('active')
     
-    if (selectedBtn && selectedPane) {
-        selectedBtn.classList.add('active')
-        selectedPane.classList.add('active')
-        currentTab = tabName
+    currentTab = tabName
+    
+    // 개인키 탭일 때 일반 복사/다운로드 버튼 숨기기
+    const actionButtons = document.querySelector('.action-buttons')
+    if (actionButtons) {
+        if (tabName === 'privateKey') {
+            actionButtons.style.display = 'none'
+        } else {
+            actionButtons.style.display = 'flex'
+        }
     }
 }
 
@@ -398,6 +446,12 @@ async function handleCopy() {
         return
     }
 
+    // 개인키 탭에서는 개인키 전용 복사 버튼 사용
+    if (currentTab === 'privateKey') {
+        showNotification('개인키는 "개인키 노출" 버튼을 클릭한 후 개인키 전용 복사 버튼을 사용하세요.')
+        return
+    }
+
     let textToCopy = ''
     
     switch (currentTab) {
@@ -406,9 +460,6 @@ async function handleCopy() {
             break
         case 'publicKey':
             textToCopy = currentResult.publicKey
-            break
-        case 'privateKey':
-            textToCopy = currentResult.privateKey
             break
         case 'address':
             textToCopy = currentResult.address
@@ -434,6 +485,12 @@ function handleDownload() {
         return
     }
 
+    // 개인키 탭에서는 개인키 전용 다운로드 버튼 사용
+    if (currentTab === 'privateKey') {
+        showNotification('개인키는 "개인키 노출" 버튼을 클릭한 후 개인키 전용 다운로드 버튼을 사용하세요.')
+        return
+    }
+
     let content = ''
     let filename = ''
 
@@ -448,10 +505,6 @@ function handleDownload() {
         case 'publicKey':
             content = currentResult.publicKey
             filename = `${addressWithoutPrefix}_public_key.txt`
-            break
-        case 'privateKey':
-            content = currentResult.privateKey
-            filename = `${addressWithoutPrefix}_private_key.txt`
             break
         case 'address':
             content = currentResult.address
@@ -586,6 +639,89 @@ async function handleDownloadShare(index) {
     }
 }
 
+// 개인키 노출 처리
+function handleRevealPrivateKey() {
+    console.log('개인키 노출 버튼 클릭됨')
+    if (!currentResult) {
+        console.log('currentResult가 없음')
+        return
+    }
+    
+    console.log('개인키 노출 확인 대화상자 표시')
+    
+    // 임시로 확인 대화상자 제거하고 바로 노출
+    console.log('개인키 노출 확인됨 (임시)')
+    console.log('개인키:', currentResult.privateKey)
+    
+    // 개인키 노출
+    if (privateKeyText) {
+        privateKeyText.textContent = currentResult.privateKey
+        console.log('개인키 텍스트 설정 완료')
+    } else {
+        console.error('privateKeyText 요소를 찾을 수 없음')
+    }
+    
+    const warningElement = document.querySelector('.private-key-warning')
+    const contentElement = document.getElementById('privateKeyContent')
+    
+    if (warningElement) {
+        warningElement.style.display = 'none'
+        console.log('경고 메시지 숨김')
+    } else {
+        console.error('경고 요소를 찾을 수 없음')
+    }
+    
+    if (contentElement) {
+        contentElement.style.display = 'block'
+        console.log('개인키 내용 표시')
+    } else {
+        console.error('개인키 내용 요소를 찾을 수 없음')
+    }
+    
+    // 복사/다운로드 버튼 활성화
+    if (copyPrivateKeyBtn) {
+        copyPrivateKeyBtn.disabled = false
+        console.log('개인키 복사 버튼 활성화')
+    } else {
+        console.error('개인키 복사 버튼을 찾을 수 없음')
+    }
+    
+    if (downloadPrivateKeyBtn) {
+        downloadPrivateKeyBtn.disabled = false
+        console.log('개인키 다운로드 버튼 활성화')
+    } else {
+        console.error('개인키 다운로드 버튼을 찾을 수 없음')
+    }
+    
+    privateKeyRevealed = true
+    
+    showNotification('개인키가 노출되었습니다. 안전한 환경에서만 사용하세요!')
+}
+
+// 개인키 복사
+async function handleCopyPrivateKey() {
+    if (!currentResult || !privateKeyRevealed) return
+    
+    try {
+        await navigator.clipboard.writeText(currentResult.privateKey)
+        showNotification('개인키가 클립보드에 복사되었습니다!')
+    } catch (error) {
+        console.error('개인키 복사 실패:', error)
+        alert('개인키 복사에 실패했습니다.')
+    }
+}
+
+// 개인키 다운로드
+function handleDownloadPrivateKey() {
+    if (!currentResult || !privateKeyRevealed) return
+    
+    const addressWithoutPrefix = currentResult.address.replace('0x', '')
+    const filename = `${addressWithoutPrefix}_private_key.txt`
+    const content = currentResult.privateKey
+    
+    downloadFile(content, filename)
+}
+
 // 파일 다운로드
 async function downloadFile(content, filename) {
     try {
@@ -683,6 +819,14 @@ thresholdInput.addEventListener('keypress', (e) => {
 
 // 페이지 로드 시 초기 UI 설정
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM 로드 완료')
+    console.log('개인키 관련 요소들:', {
+        revealBtn: !!revealPrivateKeyBtn,
+        privateKeyText: !!privateKeyText,
+        copyBtn: !!copyPrivateKeyBtn,
+        downloadBtn: !!downloadPrivateKeyBtn
+    })
+    
     updateUIForShareCount()
 })
 

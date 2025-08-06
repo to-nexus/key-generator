@@ -76,7 +76,27 @@
                         <pre id="publicKeyContent"></pre>
                     </div>
                     <div id="privateKey" class="tab-pane">
-                        <pre id="privateKeyContent"></pre>
+                        <div class="private-key-warning">
+                            <div class="warning-icon">⚠️</div>
+                            <h3>개인키 노출 경고</h3>
+                            <div class="warning-content">
+                                <p><strong>개인키는 귀하의 모든 자산에 대한 완전한 접근 권한을 제공합니다.</strong></p>
+                                <ul>
+                                    <li>개인키가 노출되면 모든 자산이 도난당할 수 있습니다</li>
+                                    <li>해킹, 악성코드, 피싱 공격에 취약해집니다</li>
+                                    <li>NEXUS는 개인키 노출로 인한 손실에 책임을 지지 않습니다</li>
+                                    <li>안전한 환경에서만 개인키를 확인하세요</li>
+                                </ul>
+                            </div>
+                            <button id="revealPrivateKeyBtn" class="reveal-private-key-btn">개인키 노출</button>
+                        </div>
+                        <div id="privateKeyContent" class="private-key-content" style="display: none;">
+                            <pre id="privateKeyText"></pre>
+                            <div class="private-key-actions">
+                                <button id="copyPrivateKeyBtn" class="copy-btn" disabled>복사</button>
+                                <button id="downloadPrivateKeyBtn" class="download-btn" disabled>다운로드</button>
+                            </div>
+                        </div>
                     </div>
                     <div id="address" class="tab-pane">
                         <pre id="addressContent"></pre>
