@@ -149,3 +149,6 @@ temp/
 
 # Wails specific
 wailsjs/
+
+# Release binaries
+releases/
