@@ -84,21 +84,237 @@ key-generator/
 ## 개발
 
 ### 환경 설정
+
+#### 필수 요구사항
+- **Go**: 1.19 이상
+- **Node.js**: 16 이상
+- **Wails CLI**: 최신 버전
+
+#### 설치 방법
+
+**1. Go 설치**
 ```bash
-# Go 설치 (1.19+)
-# Node.js 설치 (16+)
-# Wails CLI 설치
+# macOS (Homebrew)
+brew install go
+
+# Windows (Chocolatey)
+choco install golang
+
+# Linux
+sudo apt-get install golang-go
+```
+
+**2. Node.js 설치**
+```bash
+# macOS (Homebrew)
+brew install node
+
+# Windows (Chocolatey)
+choco install nodejs
+
+# Linux
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+**3. Wails CLI 설치**
+```bash
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
 ```
 
 ### 개발 모드 실행
+
+#### 기본 개발 서버 실행
 ```bash
+# 프로젝트 루트 디렉토리에서
 wails dev
 ```
 
-### 프로덕션 빌드
+#### 개발 옵션
 ```bash
+# 특정 포트로 실행
+wails dev -port 8080
+
+# 개발자 도구 활성화
+wails dev -devtools
+
+# 프론트엔드만 빌드
+wails dev -skipbindings
+
+# 백엔드만 빌드
+wails dev -skipfrontend
+```
+
+### 플랫폼별 빌드 방법
+
+#### 1. 현재 플랫폼용 빌드
+```bash
+# 현재 OS용 실행 파일 생성
 wails build
+
+# 압축 없이 빌드
+wails build -compress=false
+
+# 디버그 정보 포함
+wails build -ldflags="-s -w"
+```
+
+#### 2. macOS 빌드
+
+**Intel Mac용**
+```bash
+wails build -platform darwin/amd64
+```
+
+**Apple Silicon Mac용**
+```bash
+wails build -platform darwin/arm64
+```
+
+**Universal Binary (Intel + Apple Silicon)**
+```bash
+wails build -platform darwin/universal
+```
+
+#### 3. Windows 빌드
+
+**64비트 Windows**
+```bash
+wails build -platform windows/amd64
+```
+
+**32비트 Windows**
+```bash
+wails build -platform windows/386
+```
+
+#### 4. Linux 빌드
+
+**64비트 Linux**
+```bash
+wails build -platform linux/amd64
+```
+
+**ARM64 Linux**
+```bash
+wails build -platform linux/arm64
+```
+
+### 빌드 옵션
+
+#### 일반 옵션
+```bash
+# 프로덕션 모드 (기본값)
+wails build -production
+
+# 개발 모드
+wails build -debug
+
+# 압축 활성화
+wails build -compress
+
+# 바인딩 생성 건너뛰기
+wails build -skipbindings
+
+# 프론트엔드 빌드 건너뛰기
+wails build -skipfrontend
+```
+
+#### 고급 옵션
+```bash
+# 커스텀 LDFlags
+wails build -ldflags="-X main.version=1.0.1"
+
+# 특정 태그로 빌드
+wails build -tags="release"
+
+# 웹뷰 로더 설정 (Windows)
+wails build -tags="native_webview2loader"
+```
+
+### 배포용 빌드
+
+#### 릴리스 빌드
+```bash
+# 모든 플랫폼 빌드
+wails build -platform darwin/universal,windows/amd64,linux/amd64
+
+# 압축 및 최적화
+wails build -platform darwin/universal -compress -production
+```
+
+#### 배포 파일 정리
+```bash
+# 배포 디렉토리 생성
+mkdir -p releases/v1.0.1
+
+# macOS 앱 복사
+cp -r build/bin/key-generator.app releases/v1.0.1/NEXUS-Key-Generator-v1.0.1-macOS.app
+
+# Windows 실행 파일 복사
+cp build/bin/key-generator.exe releases/v1.0.1/NEXUS-Key-Generator-v1.0.1-Windows.exe
+```
+
+### 문제 해결
+
+#### 일반적인 문제들
+
+**1. 빌드 실패**
+```bash
+# 의존성 정리
+go mod tidy
+go mod download
+
+# 캐시 정리
+wails build -clean
+```
+
+**2. 프론트엔드 빌드 오류**
+```bash
+# node_modules 재설치
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**3. 바인딩 오류**
+```bash
+# 바인딩 재생성
+wails generate module
+```
+
+**4. Windows WebView2 문제**
+```bash
+# 레거시 로더 사용
+wails build -tags="native_webview2loader"
+```
+
+### 개발 팁
+
+#### 디버깅
+```bash
+# 개발자 도구 활성화
+wails dev -devtools
+
+# 로그 레벨 설정
+wails dev -log-level debug
+```
+
+#### 성능 최적화
+```bash
+# 프로덕션 빌드로 성능 테스트
+wails build -production
+wails build/bin/key-generator
+```
+
+#### 코드 품질
+```bash
+# Go 코드 검사
+go vet ./...
+
+# 프론트엔드 린트 (ESLint 설치 시)
+cd frontend
+npm run lint
 ```
 
 ## 보안 고려사항
