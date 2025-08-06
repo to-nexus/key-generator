@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/hashicorp/vault/shamir"
 )
@@ -264,32 +265,24 @@ func (a *App) CreateShareKeystore(shareHex string, password string, index int, a
 	}, nil
 }
 
-// createKeystore creates a simplified keystore JSON
+// createKeystore creates a JSON keystore file using ethereum keystore package
 func createKeystore(privateKey *ecdsa.PrivateKey, password string) string {
-	// This is a simplified keystore format
-	// In a real application, you would use proper encryption
-	keystoreData := map[string]interface{}{
-		"version": 3,
-		"id":      generateUUID(),
-		"address": crypto.PubkeyToAddress(privateKey.PublicKey).Hex(),
-		"crypto": map[string]interface{}{
-			"cipher":       "aes-128-ctr",
-			"ciphertext":   hex.EncodeToString([]byte("encrypted_private_key")), // Simplified
-			"cipherparams": map[string]interface{}{"iv": hex.EncodeToString([]byte("initialization_vector"))},
-			"kdf":          "scrypt",
-			"kdfparams": map[string]interface{}{
-				"dklen": 32,
-				"salt":  hex.EncodeToString([]byte("salt")),
-				"n":     262144,
-				"r":     8,
-				"p":     1,
-			},
-			"mac": hex.EncodeToString([]byte("mac")),
-		},
+	// Create a new keystore
+	ks := keystore.NewKeyStore("", keystore.StandardScryptN, keystore.StandardScryptP)
+
+	// Import the private key
+	account, err := ks.ImportECDSA(privateKey, password)
+	if err != nil {
+		return ""
 	}
 
-	keystoreJSON, _ := json.MarshalIndent(keystoreData, "", "  ")
-	return string(keystoreJSON)
+	// Export the account to get the keystore JSON
+	exported, err := ks.Export(account, password, password)
+	if err != nil {
+		return ""
+	}
+
+	return string(exported)
 }
 
 // generateUUID generates a simple UUID-like string
